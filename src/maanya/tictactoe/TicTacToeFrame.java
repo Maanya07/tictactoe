@@ -87,6 +87,9 @@ public class TicTacToeFrame extends JFrame implements View {
         for (int c = 0; c < size; c++) {
           Mark mark = board.getMarkAt(r, c);
 
+          // reset to base pink every render (clears old win colours)
+          buttons[r][c].setBackground(TILE_PINK);
+
           if (mark == Mark.EMPTY) {
             buttons[r][c].setText("");
             buttons[r][c].setForeground(Color.BLACK);
@@ -132,4 +135,6 @@ public class TicTacToeFrame extends JFrame implements View {
       }
     });
   }
+
+
 }

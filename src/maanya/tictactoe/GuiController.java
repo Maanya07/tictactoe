@@ -1,10 +1,11 @@
 package maanya.tictactoe;
 
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 public class GuiController implements CellClickListener {
 
-  private final Board board;
+  private Board board;
   private final StrategyPlayer aiPlayer;        // plays as O
   private final TicTacToeFrame view;
 
@@ -74,7 +75,6 @@ public class GuiController implements CellClickListener {
     currentTurn = Mark.X;
     playerTimeLeftSeconds = TURN_TIME_SECONDS;
 
-    // ensure board is up to date + message shows time
     view.showBoard(board);
     view.showMessage("Your turn (X). Time left: " + playerTimeLeftSeconds + "s");
 
@@ -140,10 +140,11 @@ public class GuiController implements CellClickListener {
     }
     view.showMessage("Time's up! AI wins (O).");
     view.disableAllButtons();
+    offerPlayAgain();
   }
 
   // ---------------------------------------------------------
-  // existing game-over logic, with colour highlight
+  // game-over logic, with colour highlight + "play again?"
   // ---------------------------------------------------------
   private boolean checkGameOver() {
     if (board.hasWinner()) {
@@ -164,6 +165,7 @@ public class GuiController implements CellClickListener {
 
       view.disableAllButtons();
       stopPlayerTimer();
+      offerPlayAgain();
       return true;
 
     } else if (board.isFull()) {
@@ -171,9 +173,40 @@ public class GuiController implements CellClickListener {
       view.showMessage("It's a draw!");
       view.disableAllButtons();
       stopPlayerTimer();
+      offerPlayAgain();
       return true;
     }
 
     return false;
+  }
+
+  /** Ask the user if they want to play again, and reset if yes. */
+  private void offerPlayAgain() {
+    int choice = JOptionPane.showConfirmDialog(
+        view,
+        "Play again?",
+        "Game over",
+        JOptionPane.YES_NO_OPTION
+    );
+
+    if (choice == JOptionPane.YES_OPTION) {
+      resetGame();
+    }
+  }
+
+  /** Reset board, timers, and start a fresh game with same difficulty. */
+  private void resetGame() {
+    // stop any timers
+    stopPlayerTimer();
+    if (aiMoveTimer != null && aiMoveTimer.isRunning()) {
+      aiMoveTimer.stop();
+    }
+
+    // brand-new board
+    this.board = new Board();
+
+    // redraw base board & start again
+    currentTurn = Mark.X;
+    startPlayerTurn();
   }
 }
